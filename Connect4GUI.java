@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Connect4GUI {
 
@@ -48,14 +49,27 @@ public class Connect4GUI {
         frame.repaint();
     }
 
-    private void setupPlayers(int numberOfPlayers, boolean AI){
+    private void setupPlayers(int numberOfPlayers, boolean hasAI) {
         List<Player> playerList = new ArrayList<>();
+        Random random = new Random();
 
-
-        for(int i = 0; i < numberOfPlayers; i++){
-            Player player = new Player
+        // Loop to create players based on the number of human players
+        for (int i = 0; i < numberOfPlayers; i++) {
+            // Randomly select a color from the global colors array
+            Color randomColor = colors[random.nextInt(colors.length)];
+            Player player = new Player(randomColor);
+            playerList.add(player);
         }
 
+        // If AI is present, create one AI player
+        if (hasAI) {
+            Color aiColor = Color.YELLOW; // Keep AI color fixed as YELLOW for distinction
+            Player aiPlayer = new Player.AI(aiColor);
+            playerList.add(aiPlayer);
+        }
+
+        // Initialize the GameController with the created players
+        controller.initializePlayers(playerList);
     }
 
 
