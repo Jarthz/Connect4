@@ -1,27 +1,32 @@
 import javax.swing.*;
+
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
+
 
 public class GameController {
 
-    private List<Player> players;
-    private boolean gameOver;
+    private boolean gameOverBool;
     private Connect4GUI gui;
-    private int currentPlayerIndex;
+    private Player currentPlayer;
+    private List<Player> players;
+    private int currentPlayerIndex = 0;
 
     //
     public GameController(Connect4GUI gui) {
         this.gui = gui;
-        this.gameOver = false;
-        this.players = new ArrayList<>()
+        this.gameOverBool = false;
     }
 
-    public void initialisePlayers(List<Player> players) {
-        this.players = players;
-        this.currentPlayerIndex = 0;
+
+    public void setupPlayers(int numberOfPlayers, boolean AI){
+        players = Player.setupPlayers(numberOfPlayers, AI, gui.getColours());
+        currentPlayer = players.get(0);
 
     }
+
 
 
     public void dropToken(int column) {
@@ -41,54 +46,52 @@ public class GameController {
         //human move calls the lamber and parses the params column from the action listener and human red colour
 
         if(!(currentPlayer instanceof Player.AI)) {
-            placeToken.accept(column, player1.colour);
+            placeToken.accept(column, currentPlayer.colour);
+            switchTurns();
         }
+
+
 
         //'AI' move (yellow)
         //call the makeAIMove method from the subclass and return the value to an int effictive final
-        else {
-            int columnAI = ((Player.AI) player2).makeAIMove(gridButtons[0].length);
+        if(currentPlayer instanceof Player.AI){
+            int columnAI = ((Player.AI) currentPlayer).makeAIMove(gridButtons[0].length);
             //lambda to now place this token based on the column
-            placeToken.accept(columnAI, player2.colour);
-        }
-        if(gameOver()){
-            return;
+            placeToken.accept(columnAI, currentPlayer.colour);
+            switchTurns();
         }
 
+        gameOver();
 
-        // Switch turns after both moves
-        switchTurns();
+
     }
 
 
     //change the current player
     public void switchTurns() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-    }
-
-    public Player getCurrentPlayer() {
-        return players.get(currentPlayerIndex);
-    }
-
-
-    public interface GameOverCheck{
-        boolean check(Player player);
+        currentPlayer = players.get(currentPlayerIndex);
     }
 
 
 
-    GameOverCheck gameOverCheck = (player) -> {
-        if (checkWinner(player.colour)) {
-            System.out.println("Winner is " + player);
-            return true;
-        }
-        return false;
-    };
-
-
-    public boolean gameOver(){
-        return gameOverCheck.check(player1) || gameOverCheck.check(player2);
+    public void gameOverCheck(
+            Predicate<Player> playerPredicate){
+            for (Player p : players){
+                if(playerPredicate.test (p)) {
+                    System.out.println("Winner is " + p.toString());
+                    gameOverBool = true;
+                    return;
+                }
+            }
     }
+
+    public void gameOver(){
+        gameOverCheck(
+                p -> checkWinner(p.colour)
+        );
+    }
+
 
     public boolean checkWinner(Color playerColor) {
         JButton[][] gridButtons = gui.getGridButtons();

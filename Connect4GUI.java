@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ public class Connect4GUI {
     private int row = 7;
     private GameController controller;
 
-    private Color[] colors = {Color.RED, Color.GREEN, Color.BLUE, Color.MAGENTA};
+
+    //can add to this public colour scheme
+    public Color[] colours = {Color.RED, Color.YELLOW,};
 
     public Connect4GUI() {
         frame = new JFrame("Connect4");
@@ -22,15 +25,30 @@ public class Connect4GUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
+        welcomeScreen();
+    }
+
+    public void welcomeScreen(){
         mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayout(4, 1));
+        mainPanel.setLayout(new GridLayout(3, 1));
 
         JButton onePlayerButton = new JButton("1 Player");
         JButton twoPlayerButton = new JButton("2 Players");
         JButton startButton = new JButton("Start Game");
 
-        onePlayerButton.addActionListener(e -> setupPlayers(1, true));
-        twoPlayerButton.addActionListener(e -> setupPlayers(2, false));
+        onePlayerButton.setToolTipText("Local game against an AI");
+        twoPlayerButton.setToolTipText("Local game PVP");
+
+        onePlayerButton.addActionListener(e -> {
+            controller.setupPlayers(1, true);
+            disableButton(onePlayerButton, twoPlayerButton);
+        });
+
+        twoPlayerButton.addActionListener(e -> {
+            controller.setupPlayers(2, false);
+            disableButton(onePlayerButton, twoPlayerButton);
+        });
+
         startButton.addActionListener(e -> startGame());
 
         mainPanel.add(onePlayerButton);
@@ -41,6 +59,22 @@ public class Connect4GUI {
         frame.setVisible(true);
     }
 
+    //dead code currently
+    private JButton createButton(AbstractAction action, Color backGroundColour, JButton button){
+        button.addActionListener(action);
+        if(backGroundColour != null){
+            button.setBackground(backGroundColour);
+        }
+        return button;
+        }
+
+    public void disableButton(JButton... buttons){
+        for(JButton button : buttons){
+            button.setEnabled(false);
+        }
+
+    }
+
     private void startGame(){
         frame.remove(mainPanel);
         gamePanel = createGamePanel();
@@ -49,31 +83,10 @@ public class Connect4GUI {
         frame.repaint();
     }
 
-    private void setupPlayers(int numberOfPlayers, boolean hasAI) {
-        List<Player> playerList = new ArrayList<>();
-        Random random = new Random();
-
-        // Loop to create players based on the number of human players
-        for (int i = 0; i < numberOfPlayers; i++) {
-            // Randomly select a color from the global colors array
-            Color randomColor = colors[random.nextInt(colors.length)];
-            Player player = new Player(randomColor);
-            playerList.add(player);
-        }
-
-        // If AI is present, create one AI player
-        if (hasAI) {
-            Color aiColor = Color.YELLOW; // Keep AI color fixed as YELLOW for distinction
-            Player aiPlayer = new Player.AI(aiColor);
-            playerList.add(aiPlayer);
-        }
-
-        // Initialize the GameController with the created players
-        controller.initializePlayers(playerList);
-    }
-
 
     private JPanel createGamePanel(){
+        JPanel backPanel = new JPanel(new BorderLayout());
+
         //create the board using the grid class layout manager
         gamePanel = new JPanel(new GridLayout(row, column));
 
@@ -136,6 +149,7 @@ public class Connect4GUI {
 
 
         frame.add(gamePanel);
+        return gamePanel;
     }
 
     public void setController(GameController controller) {
@@ -149,6 +163,10 @@ public class Connect4GUI {
     //getter to get the grid buttons for the controller to use
     public JButton[][] getGridButtons() {
         return gridButtons;
+    }
+
+    public Color[] getColours(){
+        return colours;
     }
 
 
