@@ -2,13 +2,12 @@ public class Main {
 
     public static void main(String[] args){
 
-        Connect4GUI gui = new Connect4GUI();
+        Board board = new Board(7,6);
 
-        GameController game = new GameController(gui);
+        GameController game = new GameController(board);
 
-        gui.setController(game);
+        game.start();
 
-        gui.show();
 
     }
 }
