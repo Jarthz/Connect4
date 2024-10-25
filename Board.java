@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -18,6 +19,7 @@ public class Board {
         for(int i = 0; i < width; i++){
             for(int j = 0; j < height; j++){
                 action.accept(i,j); //do the function passed in
+
             }
         }
     }

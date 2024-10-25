@@ -50,30 +50,14 @@ public class WelcomeScreen extends GUI {
 
     //the game controller will cast the WelcomeScreen class type
     //so that it gets access to this method
+    //this method will l;oop through all the Jbuttons and then add the e ActionPerformed class parameter
+
     public void setButtonListeners(ActionListener listener){
         for(Component component : mainPanel.getComponents()){
             if(component instanceof JButton){
                 ((JButton) component).addActionListener(listener);
             }
         }
-    }
-
-
-    //these we'll override the GUI parent class and be accessed through that
-    public void setPlayerButtons(JButton button){
-        playerButtons.add(button);
-    }
-
-    public JButton setStartButton(JButton button){
-        return startButton = button;
-    }
-
-    public JButton getStartButton(){
-        return startButton;
-    }
-
-    public JButton[] getPlayerButtons(){
-        return this.playerButtons.toArray(new JButton[playerButtons.size()]);
     }
 
 

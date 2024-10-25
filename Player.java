@@ -7,8 +7,9 @@ public class Player implements PlayerInterface{
 
     private Color colour;
     private String name;
-    private int wins;
-    //consider adding a win count
+    private int Score;
+
+
 
     public Player(Color colour, String name) {
         this.colour = colour;
@@ -26,14 +27,15 @@ public class Player implements PlayerInterface{
     }
 
 
+    //didn't build this in the end but have to adhere to my interface and contain this blank methods
     @Override
     public int getScore() {
-        return wins;
+        return Score;
     }
 
     @Override
     public void incrementScore(){
-        wins++;
+        Score++;
     }
 
 
@@ -44,6 +46,11 @@ public class Player implements PlayerInterface{
 
     //public class level method to setup objects of this class from the controller
     public static List<Player> setupPlayers(int numberOfPlayers, boolean hasAI, Color[] colours){
+        //error handling
+        if(numberOfPlayers > colours.length){
+            throw new IllegalArgumentException("Number of players must be less than or equal to number of colours");
+        }
+
         List<Player> players = new ArrayList<>();
         List<Color> availableColours = new ArrayList<>(List.of(colours));
 
@@ -54,15 +61,16 @@ public class Player implements PlayerInterface{
         }
 
         if (hasAI) {
-            Player aiPlayer = new AI( Color.YELLOW,"AI");
+            Player aiPlayer = new AI( availableColours.getLast(),"AI");
             players.add(aiPlayer);
         }
 
         return players;
     }
 
-//static nested class AI. Inherits the structure of player without needing to be an instance of player
-    //in theory we could setup AI vs AI in the future. Bit boring though...
+//static inner/nested class AI. Inherits the structure of player without needing to be an instance of player
+    //in theory we could setup AI vs AI in the future by doing this. Bit boring but that's the decision process
+    //if this gets more complex, then would actually make this a standalone subclass but for now this is fine
 
     public static class AI extends Player {
 
@@ -70,15 +78,16 @@ public class Player implements PlayerInterface{
             super(colour, name);
         }
 
+        //to do, review this so that the AI doesn't try and drop to a full column
         public int makeAIMove(int columns) {
             return (int) (Math.random() * columns);
 
         }
 
-        @Override
-        public String toString(){
-            return super.toString();
-        }
+      //  @Override
+        //public String toString(){
+          //  return super.toString();
+       // }
 
     }
 

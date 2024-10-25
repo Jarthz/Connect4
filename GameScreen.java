@@ -27,18 +27,19 @@ public class GameScreen extends GUI {
 
     private JPanel createGamePanel(){
         //create a back panel so that we can print stuff in addition to the game board
+        //dont' actually do this currently
         backPanel = new JPanel(new BorderLayout());
 
-        //main game panel based on the sizes given from the board object create in main
+        //main game panel based on the sizes given from the board object created in main
         gamePanel = new JPanel(new GridLayout(board.getRow(), board.getColumn()));
 
-        //initialise an array of Jubbton objects. we'll add buttons with action listeners
+        //initialise an array of Jubbton objects. same dimensions as the board and panel
         gridButtons = new JButton[board.getRow()][board.getColumn()];
 
 
-        Board.buildBoard(board.getRow(), board.getColumn(), (x, y) ->{
+        board.buildBoard(board.getRow(), board.getColumn(), (x, y) ->{
             JButton button = new JButton();
-            button.setBackground(Color.WHITE);
+            button.setBackground(defaultColour);
             //add the button to the array for reference
             gridButtons[x][y] = button;
             //need an unmodified variable (make effectively final) for lambdas
@@ -58,7 +59,7 @@ public class GameScreen extends GUI {
 
         Wehn the JButton button object implements the Listener interface, it gets Class ActionEvent related to it as an instanced object
 
-        'e' is a high level event and because the button object added the method, clicking the button generates 'e' and invokes the method actionPerformed
+        'e' is a high level event and because the button object added the method, clicking the button generates 'e'
 
         becasue actionPerformed is a method in an interface we have to impliment it
         BUT actionPerformed is the only abstract method of the interface
@@ -71,9 +72,10 @@ public class GameScreen extends GUI {
         This will invoke actionPerformed method for us without needing to write an explicit method
 
         finally we'll add an expression body to the lambdas that will call another method dropToken and the parameter which column to actually do something once it's confirmed and event has occured
+        this expresison will be invoked when the method actionPerformed is returned true
 
-        this is BAD encapsulation. Notice the welcomeScreen Class does not handle action events directly, rather being invoked byt he game controller
-        I just thought this would be cool and something to discuss
+        this is BAD encapsulation. Notice the welcomeScreen Class GUI does not handle action events directly, rather being invoked byt he game controller to seperate concerns
+        I just thought this would be cool nesting a lambdas in a lambdas and something to discuss
 
          */
 
@@ -87,10 +89,14 @@ public class GameScreen extends GUI {
 
     }
 
-
+//this method is accessed outside of the GUI heirachy and we want to return the grid buttons here rather than the parent
 @Override
     public JButton[][] getGridButtons(){
         return this.gridButtons;
+    }
+
+    public void setDefaultColour(Color colour) {
+        super.setDefaultColour(colour);
     }
 
 
