@@ -13,7 +13,7 @@ public class GameController {
     private List<Player> players;
     private int currentPlayerIndex = 0;
     private GUI currentPanel;
-    private Board gameBoard;
+    private final Board gameBoard;
 
 
     public GameController(Board gameBoard) {
@@ -32,9 +32,9 @@ public class GameController {
         currentPanel = new WelcomeScreen();
         currentPanelInitialise(currentPanel);
 
-        //assign action listeners to the JButtons on the welcome screen using a method
+        //assign action listeners to the JButtons on the welcome screen using a method reference to this listener
         //welcomeAction method argument listens to the ActionPerformed object
-        currentPanel.setButtonListeners(e -> welcomeActions(e));
+        currentPanel.setButtonListeners(this::welcomeActions);
     }
 
     //receive button event and then do action based on which button
@@ -42,14 +42,16 @@ public class GameController {
     private void welcomeActions(ActionEvent e){
         String command = e.getActionCommand();
 
-        if(command.equals("onePlayer")){
-            setupPlayers(1, true);
-            welcomeDefensiveBlockers();
-        } else if (command.equals("twoPlayers")) {
-            setupPlayers(2, false);
-            welcomeDefensiveBlockers();
-        } else if(command.equals("start")){
-            startGame();
+        switch (command) {
+            case "onePlayer" -> {
+                setupPlayers(1, true);
+                welcomeDefensiveBlockers();
+            }
+            case "twoPlayers" -> {
+                setupPlayers(2, false);
+                welcomeDefensiveBlockers();
+            }
+            case "start" -> startGame();
         }
     }
 

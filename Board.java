@@ -7,8 +7,8 @@ import java.util.function.Predicate;
 
 public class Board {
 
-    private int row;
-    private int column;
+    private final int row;
+    private final int column;
 
     public Board(int width, int height) {
         this.row = width;

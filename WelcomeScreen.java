@@ -66,8 +66,4 @@ public class WelcomeScreen extends GUI {
             }
         }
     }
-
-    public void setPlayerButtons(JButton button){
-        playerButtons.add(button);
-    }
 }

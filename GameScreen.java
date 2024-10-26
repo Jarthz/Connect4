@@ -2,13 +2,12 @@
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 public class GameScreen extends GUI {
 
     private JPanel gamePanel;
     private JButton[][] gridButtons;
-    private Board board;
+    private final Board board;
 
     public GameScreen(Board board) {
         super();
@@ -56,7 +55,7 @@ public class GameScreen extends GUI {
             int finalCol = y;
 
             //add the listener and immediately invoke the actionPerformed method and create lambda body to call the drop token method from the GameController
-            button.addActionListener((ActionEvent e) -> {
+            button.addActionListener(event -> {
                 controller.dropToken(finalCol);
             });
             //add the button to the gui

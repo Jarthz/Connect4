@@ -3,7 +3,7 @@
 import javax.swing.*;
 
 public class WinnerScreen extends GUI {
-    private String winner;
+    private final String winner;
 
     public WinnerScreen(String winner) {
         super();

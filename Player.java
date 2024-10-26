@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player implements PlayerInterface{
-    private Color colour;
-    private String name;
+    private final Color colour;
+    private final String name;
     private int Score;
 
     public Player(Color colour, String name) {

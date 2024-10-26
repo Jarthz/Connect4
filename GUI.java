@@ -54,8 +54,7 @@ public abstract class GUI {
     //to accomdate the classes that inherit this change so they don't have to refactor their code for this update
     //i modify the arrylist to being an array in the getter to return the expect type
     public Color[] getColours(){
-        Color[] coloursArray = colours.toArray(new Color[colours.size()]);
-        return coloursArray;
+        return colours.toArray(new Color[colours.size()]);
     }
 
     public ArrayList<Color> getColoursArray(){
@@ -67,13 +66,13 @@ public abstract class GUI {
     }
 
     public void setDefaultColour(Color colour){
-        this.defaultColour = colour;
+        defaultColour = colour;
         updateColourScheme();
     }
 
     //future state to update the gamescreen background
     protected void updateColourScheme(){
-        this.frame.repaint();
+        frame.repaint();
     }
 
     public void disableButton(JButton... buttons){
