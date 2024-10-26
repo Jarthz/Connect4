@@ -1,3 +1,4 @@
+//simple class and nested inner class that handle user prompts when they try and break the game
 import javax.swing.*;
 
 public class ColumnFull extends GUI{

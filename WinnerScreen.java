@@ -1,3 +1,5 @@
+//simple congrats message
+
 import javax.swing.*;
 
 public class WinnerScreen extends GUI {
@@ -10,7 +12,6 @@ public class WinnerScreen extends GUI {
 
     @Override
     public void showScreen() {
-
         JOptionPane.showMessageDialog(frame, winner, "Game Over", JOptionPane.INFORMATION_MESSAGE);
         frame.setVisible(false);
         frame.dispose();

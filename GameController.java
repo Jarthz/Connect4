@@ -1,129 +1,45 @@
-import javax.swing.*;
+//Controller class interacts with player input, GUI and game logic. It handles the execution flow.
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-
 public class GameController {
-
 
     private Player currentPlayer;
     private List<Player> players;
     private int currentPlayerIndex = 0;
     private GUI currentPanel;
     private Board gameBoard;
-    private WelcomeScreen welcomeScreen;
-    private GameScreen gameScreen;
-    private WinnerScreen winnerScreen;
-    private ColumnFull columnFull;
 
 
-
-    //contructor, create a board object as param for this class
     public GameController(Board gameBoard) {
         this.gameBoard = gameBoard;
-
     }
 
-    public void recordWin(){
-        currentPlayer = players.get(currentPlayerIndex);
-        currentPlayer.incrementScore();
+    //utility method when setting up new GUI subclass
+    private void currentPanelInitialise(GUI panel){
+        panel.setController(this);
+        //abstract method of the subclass, all must have this method
+        panel.showScreen();
     }
 
+    //start the program on the welcome screen and handle player instantiation
     public void start(){
         currentPanel = new WelcomeScreen();
-        currentPanel.setController(this);
-        currentPanel.showScreen();
+        currentPanelInitialise(currentPanel);
 
-        //same logic as before that we can call the actionperformed method as it's abstract of the interface directly by passing this class as a parameter and a lambdas do method
-        ((WelcomeScreen) currentPanel).setButtonListeners(e -> welcomeActions(e));
-
+        //assign action listeners to the JButtons on the welcome screen using a method
+        //welcomeAction method argument listens to the ActionPerformed object
+        currentPanel.setButtonListeners(e -> welcomeActions(e));
     }
 
-    /*wanted to do something fun and create a halloween special board object. Problem is that GUI has default colour white as a non static so each subclass instance inherits the original definition
-
-    i could make the GUI interface static and then update the default colour
-    BUT i wanted to run two concurrent games, one with the default white and one with haloween
-    in hindsight then, GUI could instead not be an abstract class and should have a static modifier for default colour. I could create it as an object for each gamecontroller instance
-
-    But instead, its staying abstract and I need to modify the object instance that inherits it. The problem is because of the flow of operations, i have to inject in the middle of the program the default colour scheme
-    I don't create the object in question until many methods in
-
-    so i've done some overloading, passing from main the default colour through the methods until it gets to where it needs to be
-
-     */
-
-    //halloween overloading
-    public void start(Color defaultColour){
-        currentPanel = new WelcomeScreen();
-        currentPanel.setController(this);
-        currentPanel.showScreen();
-        ((WelcomeScreen) currentPanel).setButtonListeners(e -> welcomeActions(e, defaultColour));
-
-    }
-
-    public void startGame(){
-        removeFrame();
-        currentPanel = new GameScreen(gameBoard);
-        currentPanel.setController(this);
-        currentPanel.showScreen();
-    }
-
-    //overloading
-    public void startGame(Color defaultColour){
-        removeFrame();
-        currentPanel = new GameScreen(gameBoard);
-        currentPanel.setController(this);
-        currentPanel.setDefaultColour(defaultColour);
-        currentPanel.showScreen();
-    }
-
-
-    public void removeColourScheme(){
-        currentPanel.removeAllColours();
-    }
-    public void addColourScheme(Color colour){
-        currentPanel.addColour(colour);
-    }
-
-
-    public void showWinner(String winner){
-        removeFrame();
-        currentPanel = new WinnerScreen(winner);
-        currentPanel.setController(this);
-        currentPanel.showScreen();
-        start();
-    }
-
-    public void showColumnFull(){
-        GUI fullPanel = new ColumnFull();
-        fullPanel.showScreen();
-    }
-
-    public void showBoardFull(){
-        removeFrame();
-        GUI fullPanel = new ColumnFull.BoardFull();
-        fullPanel.showScreen();
-        start();
-    }
-
-    public void setupPlayers(int numberOfPlayers, boolean AI){
-        players = Player.setupPlayers(numberOfPlayers, AI, currentPanel.getColours());
-        currentPlayerIndex = 0;
-        currentPlayer = players.get(currentPlayerIndex);
-
-    }
-
-    public void removeFrame(){
-        JFrame frame = currentPanel.getFrame();
-        frame.dispose();
-
-    }
-
-    public void welcomeActions(ActionEvent e){
+    //receive button event and then do action based on which button
+    //either setup players + AI or start game
+    private void welcomeActions(ActionEvent e){
         String command = e.getActionCommand();
 
         if(command.equals("onePlayer")){
@@ -135,192 +51,204 @@ public class GameController {
         } else if(command.equals("start")){
             startGame();
         }
-
     }
 
-    //haloween overloading
-    public void welcomeActions(ActionEvent e, Color defaultColour){
-        String command = e.getActionCommand();
-        if(command.equals("onePlayer")){
-            setupPlayers(1, true);
-            welcomeDefensiveBlockers();
-        } else if (command.equals("twoPlayers")) {
-            setupPlayers(2, false);
-            welcomeDefensiveBlockers();
-        } else if(command.equals("start")){
-            startGame(defaultColour);
-        }
+    //pass the number of players and with AI from the controller to the Player call by invoking the player setupPlayers method
+    private void setupPlayers(int numberOfPlayers, boolean AI){
+        players = Player.setupPlayers(numberOfPlayers, AI, currentPanel.getColours());
+        currentPlayerIndex = 0;
+        currentPlayer = players.get(currentPlayerIndex);
     }
 
     //error handling so you cannot start a game without players or spam build player button
-    //start game is disabled by default
-    public void welcomeDefensiveBlockers(){
+    //start game is disabled by default and needs enabling once players are created
+    private void welcomeDefensiveBlockers(){
         currentPanel.disableButton(currentPanel.getPlayerButtons());
         currentPanel.enableButton(currentPanel.getStartButton());
     }
 
+    //clear prior frame, create new GameScreen object and invoke the showFrame method through initialise
+    private void startGame(){
+        removeFrame();
+        currentPanel = new GameScreen(gameBoard);
+        currentPanelInitialise(currentPanel);
+    }
 
-
+    //unlike the welcomeActions method which is invoked from inside this class, below method is invoked from inside the GameScreen GUI and is passed in the column
     public void dropToken(int column) {
         JButton[][] gridButtons = currentPanel.getGridButtons();
         int row = gridButtons.length;
-        System.out.println(currentPlayer);
 
-        //boardfull check
-        Predicate<JButton> isNotFull = button -> button.getBackground() == currentPanel.getDefaultColour();
-        boolean boardFull = gameBoard.isBoardFull(gridButtons, isNotFull);
+        //check if the board is full before dropping
+        //function is whether the JButton is of the default colour
+        Predicate<JButton> isDefaultColour = button -> button.getBackground() == currentPanel.getDefaultColour();
+        //pass all the buttons and the above function and return true if no button is the default colour
+        boolean boardFull = gameBoard.isBoardFull(gridButtons, isDefaultColour);
 
+        //if above true, showFrame the GUI for where the board is full and execute its logic
         if(boardFull){
             showBoardFull();
         } else {
 
-            //lambda to handle token placement for each player. It'll check for the lowest row to place the token based on the column parameter
+            //define a lambda to handle token placement for each player to be invoked
             BiConsumer<Integer, Color> placeToken = (col, color) -> {
+                //checks if the column is full first
                 if (gridButtons[0][col].getBackground() == currentPanel.getDefaultColour()) {
+                    //loop backwards from the top row and place colour token at lowest cordinate
                     for (int r = row - 1; r >= 0; r--) {
+                        //
                         if (gridButtons[r][col].getBackground() == currentPanel.getDefaultColour()) {
                             gridButtons[r][col].setBackground(color);
+                            //invoke method to switch player
                             switchTurns();
                             break;
                         }
                     }
 
-                    //create logic here for the AI to see what the current full column is and choose another
+                    //if the column is full and it was a human player that tried to place the token, invoke method to showFrame screen
                 } else if(!(currentPlayer instanceof Player.AI)){
                     showColumnFull();
                 }
-
             };
 
-            //human move calls the lambda and parses the paramater column obtained from the action listener and colour
+            //human move calls the lambda and passes the paramater column obtained from the action listener and colour as arguments
             if (!(currentPlayer instanceof Player.AI)) {
                 placeToken.accept(column, currentPlayer.getColour());
             }
 
-
-            //'AI' move (yellow)
-            //call the makeAIMove method from the subclass and return the value to an int effictive final
+            //call the makeAIMove method from the subclass and return the value to an int effictive final to use by the lambda
             if (currentPlayer instanceof Player.AI) {
                 int columnAI = ((Player.AI) currentPlayer).makeAIMove(gridButtons[0].length);
                 //lambda to now place this token based on the column
                 placeToken.accept(columnAI, currentPlayer.getColour());
-
-                //TO DO add some logic that the AI automatically doesn't true to drop into a full column
             }
 
+            //check game condition and handle game exit
             isGameOver();
         }
     }
 
-    public boolean isColumnFull(int column){
-        JButton[][] gridButtons = currentPanel.getGridButtons();
-        if(gridButtons[0][column].getBackground() == currentPanel.getDefaultColour()){
-            return false;
-        }
-        return true;
+    //simple msg dialgoue to inform user
+    private void showColumnFull(){
+        GUI fullPanel = new ColumnFull();
+        fullPanel.showScreen();
     }
 
+    //showFrame gui for full board and restart the game from the welcome screen
+    private void showBoardFull(){
+        removeFrame();
+        GUI fullPanel = new ColumnFull.BoardFull();
+        fullPanel.showScreen();
+        start();
+    }
 
-    //change the current player
+    private void showWinner(String winner){
+        removeFrame();
+        currentPanel = new WinnerScreen(winner);
+        currentPanelInitialise(currentPanel);
+
+        //restart the whole process from welcome screen
+        start();
+    }
+
+    //was having a issue with multiple frames so forced dispose of the frame
+    //instantiating a gui always create a new frame
+    private void removeFrame(){
+        JFrame frame = currentPanel.getFrame();
+        frame.dispose();
+    }
+
+    //change the current player, dynamic enough for future if we extended the number of players eventually
     public void switchTurns() {
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         currentPlayer = players.get(currentPlayerIndex);
     }
 
+    //broke up win condition into inner class.
+    public void isGameOver(){
+        WinCondition winnerCheck = new WinCondition();
 
-//change this to a block consumer logic to handle print message
-    public boolean isGameOver(){
-        gameOverCheck(
-                p -> checkWinner(p.getColour())
+        //pass simple predicate of player argument and then test argument for check if that player is a winner
+        winnerCheck.gameOverPlayersCheck(
+                p -> winnerCheck.checkWinner(p.getColour())
         );
-        return true;
     }
 
-    //refactor this so that it doesn't call the screen in this loop
-    public void gameOverCheck(
-            Predicate<Player> playerPredicate){
-        for (Player p : players){
-            if(playerPredicate.test (p)) {
-                String message = "Winner is " + p.toString();
-                showWinner(message);
-                return;
-            }
-        }
+    //inner class groups win logic and accesses parent game controller fields
+    private class WinCondition {
 
-    }
-
-    public void gameOverCheck2(Predicate<Player> playerPredicate){
-        if(playerPredicate.test(currentPlayer)){
-            System.out.println("game over 2 " + currentPlayer);
-        }
-    }
-
-    public boolean gameOver2(){
-        gameOverCheck2(
-                p -> checkWinner(p.getColour())
-        );
-        return true;
-    }
-
-
-
-    public boolean checkWinner(Color playerColor) {
-        JButton[][] gridButtons = currentPanel.getGridButtons();
-        int rows = gridButtons.length;
-        int columns = gridButtons[0].length;
-
-        // Define the directions to check: right, down, down-right diagonal, and down-left diagonal
-        int[][] directions = {
-                {0, 1},   // Right (horizontal)
-                {1, 0},   // Down (vertical)
-                {1, 1},   // Down-right diagonal
-                {1, -1}   // Down-left diagonal
-        };
-
-        // Loop through all grid positions
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < columns; col++) {
-                // Check if the current button matches the player's color
-                if (gridButtons[row][col].getBackground() == playerColor) {
-                    // Check all 4 possible directions
-                    for (int[] direction : directions) {
-                        if (checkDirection(row, col, direction[0], direction[1], playerColor)) {
-                            return true;  // Winner found!
-                        }
-                    }
+        //This function is a loop predicate of Player class type and the then inputted argument
+        public void gameOverPlayersCheck(
+                Predicate<Player> playerPredicate) {
+            //loop the players array for each player
+            for (Player p : players) {
+                //test the player for the test argument checkWeinner
+                if (playerPredicate.test(p)) {
+                    //if true invoke the winner gui
+                    String message = "Winner is " + p.toString();
+                    showWinner(message);
+                    return;
                 }
             }
         }
 
-        return false;  // No winner found
-    }
+        //this is complicated and invokes another method so going to repeat code on purpose
+        //not going to use the board loop function
+        public boolean checkWinner(Color playerColor) {
+            JButton[][] gridButtons = currentPanel.getGridButtons();
+            int maxRows = gridButtons.length;
+            int maxColumns = gridButtons[0].length;
 
-    private boolean checkDirection(int row, int col, int rowDelta, int colDelta, Color playerColor) {
-        JButton[][] gridButtons = currentPanel.getGridButtons();
-        int rows = gridButtons.length;
-        int columns = gridButtons[0].length;
+            // create an array of transformation vectors for the loop to check once it finds a player colour: right, down, down-right, and down-left
+            int[][] directions = {
+                    {0, 1},   // Right
+                    {1, 0},   // Down
+                    {1, 1},   // Down-right
+                    {1, -1}   // Down-left
+            };
 
-        // Check if there are 4 consecutive tokens in the given direction
-        for (int i = 1; i < 4; i++) {
-            int newRow = row + rowDelta * i;
-            int newCol = col + colDelta * i;
-
-            // Ensure the new position is within bounds
-            if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= columns) {
-                return false;
+            // loop through all grid positions
+            for (int row = 0; row < maxRows; row++) {
+                for (int col = 0; col < maxColumns; col++) {
+                    // check if the current button matches player's color
+                    if (gridButtons[row][col].getBackground() == playerColor) {
+                        // now colour found, loop through the vector array
+                        for (int[] direction : directions) {
+                            //for each vector type (right, down, diagnols etc), apply the transformation to search
+                            if (checkDirection(row, col, direction[0], direction[1], playerColor, gridButtons, maxRows, maxColumns)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
 
-            // Check if the token at the new position matches the player's color
-            if (gridButtons[newRow][newCol].getBackground() != playerColor) {
-                return false;
-            }
+            return false;
         }
 
-        return true;  // 4 consecutive tokens found!
+        //apply the vector type given int he argument in a new 4 move loop
+        private boolean checkDirection(int row, int col, int rowDelta, int colDelta, Color playerColor, JButton[][] gridButtons, int maxRows, int maxColumns) {
+
+            // loop in the modified direction and chek if there's 4 consecutive tokens in the irection
+            for (int i = 1; i < 4; i++) {
+
+                //to go right (vector 0), row = 1, rowdelta 0 * i = always 1
+                int newRow = row + rowDelta * i;
+                //going right, col = 1 + colDelta = 1, * i, will move column right by one each iteration of i
+                int newCol = col + colDelta * i;
+
+                // as vector modify range +-, make sure we donb't exceed board range and return false if we do
+                if (newRow < 0 || newRow >= maxRows || newCol < 0 || newCol >= maxColumns) {
+                    return false;
+                }
+
+                // Check if the token at the new position matches the player's color
+                if (gridButtons[newRow][newCol].getBackground() != playerColor) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
-
-
-
-
-
 }

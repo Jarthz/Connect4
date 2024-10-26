@@ -1,65 +1,73 @@
-//top level class, not nested so non stactic so can use the same public fields as abstract g
+//subclass of our GUI parent to showFrame the Welcome Screen an initalise players
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-
 public class WelcomeScreen extends GUI {
-    private JPanel mainPanel;
-
-
+    private JPanel welcomePanel;
 
     public WelcomeScreen() {
         super();
         playerButtons = new ArrayList<>();
     }
 
+    //mandatory override, public so accessable to the game controller
     @Override
     public void showScreen() {
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new GridLayout(3, 1));
+        welcomePanel = new JPanel();
+        //static layout for now
+        welcomePanel.setLayout(new GridLayout(3, 1));
 
+        //two choices of player buttons (PVE or PVP)
         JButton onePlayerButton = new JButton("1 Player");
         JButton twoPlayerButton = new JButton("2 Players");
+
         JButton startButton = new JButton("Start Game");
 
+        //add all the buttons to our array of buttons
         setPlayerButtons(onePlayerButton);
         setPlayerButtons(twoPlayerButton);
+
+
         setStartButton(startButton);
 
-
+        //this was for fun
         onePlayerButton.setToolTipText("Local game against an AI");
         twoPlayerButton.setToolTipText("Local game PVP");
 
+        //we'll callback to the GameController the action listener to properly segregate duties
+        //gamecontroller will assign the logic rather than do it here in the gui
         onePlayerButton.setActionCommand("onePlayer");
         twoPlayerButton.setActionCommand("twoPlayers");
         startButton.setActionCommand("start");
-        //parent method: by default we'll grey this out
+
+        //defensively grey startbutton so cannot start game without selecting players
         disableButton(startButton);
 
+        //add buttons to panel, panel to frame, showFrame the frame
+        welcomePanel.add(onePlayerButton);
+        welcomePanel.add(twoPlayerButton);
+        welcomePanel.add(startButton);
 
-        mainPanel.add(onePlayerButton);
-        mainPanel.add(twoPlayerButton);
-        mainPanel.add(startButton);
+        frame.add(welcomePanel);
 
-        frame.add(mainPanel);
-        show();
+        showFrame();
     }
 
-    //the game controller will cast the WelcomeScreen class type
-    //so that it gets access to this method
-    //this method will l;oop through all the Jbuttons and then add the e ActionPerformed class parameter
-
+    //override the placeholder in the parent class
+    //loop through all the buttons in the panel and add on an action listener object from the method argument
+    //this sets up the gameController to listen to the button clicks so that it can define actions rather than in here
     public void setButtonListeners(ActionListener listener){
-        for(Component component : mainPanel.getComponents()){
+        for(Component component : welcomePanel.getComponents()){
             if(component instanceof JButton){
                 ((JButton) component).addActionListener(listener);
             }
         }
     }
 
-
-
+    public void setPlayerButtons(JButton button){
+        playerButtons.add(button);
+    }
 }

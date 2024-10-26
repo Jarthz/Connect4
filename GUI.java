@@ -1,5 +1,9 @@
+//parent abstract class of all GUI subclasses. Has a single abstract method all must override
+//owns the JFrame creation which all subclasses inherit
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -8,51 +12,44 @@ public abstract class GUI {
 
 //protected class variables to be accessible by subclasses of GUI
 
-    protected JFrame frame;
+    //static JFrame so only one for all
+    protected static JFrame frame;
     protected JButton[][] gridButtons;
     protected GameController controller;
     protected ArrayList<JButton> playerButtons;
     protected JButton startButton;
-
-
-    //decided to make colour non static for the class. This allows us to modify instances to have seperate default scheme
-    //hallowwen spooky
-
-    protected Color defaultColour = Color.WHITE;
-
-
+    //decided to make colour non static for the class. All subclass instances adhere for consistency
+    protected static Color defaultColour = Color.WHITE;
     //can add to this public colour scheme in the future
-    //this was originally and array, discussion in getter method
-    protected ArrayList<Color> colours = new ArrayList<>(Arrays.asList(Color.RED, Color.YELLOW));
+    //this was originally a Color[]
+    protected static ArrayList<Color> colours = new ArrayList<>(Arrays.asList(Color.RED, Color.YELLOW));
 
     public GUI() {
         frame = new JFrame("Connect4");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
-
     }
 
-    //object specific method for each subclass object
+    //invoked externally to force each subclass to a specific controller object
     public void setController(GameController controller) {
        this.controller = controller;
     }
 
-    //this needs to be overridden by all subclasses. Any subclass GUI object needs to have a method
-    //that makes it visible to the user
+    //this needs to be overridden by all subclasses.
     protected abstract void showScreen();
 
     //utility for the controller
-    public void show(){
+    public void showFrame(){
         frame.setVisible(true);
     }
+
+    //standard getters and setters
 
     //getter to get the grid buttons for the controller to use
     public JButton[][] getGridButtons(){
         return gridButtons;
     }
 
-
-    //here is the painful part of generalisation. This getter was originally Color[] return type
     //i changed the color[] to be an arraylist object instead of an array
     //to accomdate the classes that inherit this change so they don't have to refactor their code for this update
     //i modify the arrylist to being an array in the getter to return the expect type
@@ -61,24 +58,8 @@ public abstract class GUI {
         return coloursArray;
     }
 
-    //new method
-    //i tried overloading but learnt that this doesn't work because the return types are different and that's the whole point
-    //so now it's a new method for the arraylist
-    public ArrayList<Color> getColoursArrayList(){
+    public ArrayList<Color> getColoursArray(){
         return colours;
-    }
-
-    //this is new so that now we could add to our colour arraylist in the future
-    public void addColour(Color colour){
-        colours.add(colour);
-    }
-
-    public void removeColour(Color colour){
-        colours.remove(colour);
-    }
-
-    public void removeAllColours(){
-        colours.clear();
     }
 
     public Color getDefaultColour(){
@@ -88,9 +69,9 @@ public abstract class GUI {
     public void setDefaultColour(Color colour){
         this.defaultColour = colour;
         updateColourScheme();
-
     }
 
+    //future state to update the gamescreen background
     protected void updateColourScheme(){
         this.frame.repaint();
     }
@@ -107,17 +88,12 @@ public abstract class GUI {
         }
     }
 
-
     public JButton setStartButton(JButton button){
         return startButton = button;
     }
 
     public JButton getStartButton(){
         return startButton;
-    }
-
-    public void setPlayerButtons(JButton button){
-        playerButtons.add(button);
     }
 
     public JButton[] getPlayerButtons(){
@@ -128,9 +104,12 @@ public abstract class GUI {
         return frame;
     }
 
+    public void setButtonListeners(ActionListener listener){
+    }
 
-
-
+    public void setPlayerButtons(JButton button){
+        playerButtons.add(button);
+    }
 }
 
 
