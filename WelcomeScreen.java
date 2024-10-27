@@ -58,6 +58,7 @@ public class WelcomeScreen extends GUI {
     //override the placeholder in the parent class
     //loop through all the buttons in the panel and add on an action listener object from the method argument
     //this sets up the gameController to listen to the button clicks so that it can define actions rather than in here
+    @Override
     public void setButtonListeners(ActionListener listener){
         for(Component component : welcomePanel.getComponents()){
             if(component instanceof JButton){

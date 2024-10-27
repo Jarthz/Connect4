@@ -63,12 +63,13 @@ public class GameScreen extends GUI {
         return gamePanel;
     }
 
-//this method is accessed outside of the GUI heirachy and we want to return the grid buttons here rather than the parent
-@Override
+    //this method is accessed outside of the GUI heirachy and we want to return the grid buttons here rather than the parent
+    @Override
     public JButton[][] getGridButtons(){
         return this.gridButtons;
     }
 
+    @Override
     public void setDefaultColour(Color colour) {
         super.setDefaultColour(colour);
     }

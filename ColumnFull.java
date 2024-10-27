@@ -7,6 +7,7 @@ public class ColumnFull extends GUI{
         super();
     }
 
+    @Override
     public void showScreen(){
         JOptionPane.showMessageDialog(frame, "Column Full", "Column Full", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -17,6 +18,7 @@ public class ColumnFull extends GUI{
             super();
         }
 
+        @Override
         public void showScreen(){
             JOptionPane.showMessageDialog(frame, "Board Full", "Board Full", JOptionPane.INFORMATION_MESSAGE);
         }
