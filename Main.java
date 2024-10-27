@@ -7,6 +7,5 @@ public class Main {
         GameController game = new GameController(board);
 
         game.start();
-
     }
 }

@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player implements PlayerInterface{
+public class Player implements PlayerInterface {
     private final Color colour;
     private final String name;
     private int Score;
@@ -12,8 +12,8 @@ public class Player implements PlayerInterface{
     public Player(Color colour, String name) {
         this.colour = colour;
         this.name = name;
-
     }
+
     @Override
     public String getName() {
         return name;
@@ -31,19 +31,19 @@ public class Player implements PlayerInterface{
     }
 
     @Override
-    public void incrementScore(){
+    public void incrementScore() {
         Score++;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return name;
     }
 
     //public class level method that allows outside class to create instances of the player class
-    public static List<Player> setupPlayers(int numberOfPlayers, boolean hasAI, Color[] colours){
+    public static List<Player> setupPlayers(int numberOfPlayers, boolean hasAI, Color[] colours) {
         //error check so that you can't create more players than assigned colours
-        if(numberOfPlayers > colours.length){
+        if (numberOfPlayers > colours.length) {
             throw new IllegalArgumentException("Number of players must be less than or equal to number of colours");
         }
 
@@ -52,17 +52,16 @@ public class Player implements PlayerInterface{
         List<Color> availableColours = new ArrayList<>(List.of(colours));
 
         //loop for the number of player parameter of the method and creates
-        for(int i = 1; i <= numberOfPlayers; i++) {
-            Player player = new Player(availableColours.get(i-1), "Player " + i);
+        for (int i = 1; i <= numberOfPlayers; i++) {
+            Player player = new Player(availableColours.get(i - 1), "Player " + i);
             players.add(player);
         }
 
         //if boolean true then create AI object (subclass) of the Player type
         if (hasAI) {
-            Player aiPlayer = new AI( availableColours.getLast(),"AI");
+            Player aiPlayer = new AI(availableColours.getLast(), "AI");
             players.add(aiPlayer);
         }
-
         return players;
     }
 
@@ -82,8 +81,5 @@ public class Player implements PlayerInterface{
         public int makeAIMove(int columns) {
             return (int) (Math.random() * columns);
         }
-
     }
-
-
 }

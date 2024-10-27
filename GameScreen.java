@@ -23,7 +23,6 @@ public class GameScreen extends GUI {
         //add to and show Frame
         frame.add(gamePanel);
         showFrame();
-
     }
 
     //this is a different take than the WelcomeScreen. The WelcomeScreen is better OOP as handles exclusively setting up the buttons and not the actionPerformed logic
@@ -54,7 +53,7 @@ public class GameScreen extends GUI {
             //need an unmodified variable of the column to drop into (make effectively final) for lambda
             int finalCol = y;
 
-            //add the listener and immediately invoke the actionPerformed method and create lambda body to call the drop token method from the GameController
+            //add the listener and create lambda body to call the drop token method from the GameController
             button.addActionListener(event -> {
                 controller.dropToken(finalCol);
             });
@@ -62,7 +61,6 @@ public class GameScreen extends GUI {
             gamePanel.add(button);
         });
         return gamePanel;
-
     }
 
 //this method is accessed outside of the GUI heirachy and we want to return the grid buttons here rather than the parent
@@ -74,8 +72,6 @@ public class GameScreen extends GUI {
     public void setDefaultColour(Color colour) {
         super.setDefaultColour(colour);
     }
-
-
 }
 
 

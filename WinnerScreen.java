@@ -16,5 +16,4 @@ public class WinnerScreen extends GUI {
         frame.setVisible(false);
         frame.dispose();
     }
-
 }

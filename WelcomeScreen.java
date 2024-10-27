@@ -30,7 +30,6 @@ public class WelcomeScreen extends GUI {
         setPlayerButtons(onePlayerButton);
         setPlayerButtons(twoPlayerButton);
 
-
         setStartButton(startButton);
 
         //this was for fun

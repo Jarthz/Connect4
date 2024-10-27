@@ -9,9 +9,6 @@ import java.util.Arrays;
 
 public abstract class GUI {
 
-
-//protected class variables to be accessible by subclasses of GUI
-
     //static JFrame so only one for all
     protected static JFrame frame;
     protected JButton[][] gridButtons;
@@ -87,7 +84,7 @@ public abstract class GUI {
         }
     }
 
-    public JButton setStartButton(JButton button){
+    protected JButton setStartButton(JButton button){
         return startButton = button;
     }
 
@@ -106,7 +103,7 @@ public abstract class GUI {
     public void setButtonListeners(ActionListener listener){
     }
 
-    public void setPlayerButtons(JButton button){
+    protected void setPlayerButtons(JButton button){
         playerButtons.add(button);
     }
 }

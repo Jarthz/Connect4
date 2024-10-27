@@ -20,6 +20,5 @@ public class ColumnFull extends GUI{
         public void showScreen(){
             JOptionPane.showMessageDialog(frame, "Board Full", "Board Full", JOptionPane.INFORMATION_MESSAGE);
         }
-
     }
 }
