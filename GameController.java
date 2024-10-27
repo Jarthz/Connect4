@@ -20,11 +20,10 @@ public class GameController {
     private GUI currentPanel;
     //use the Board object to define our board and ranges
     private final Board gameBoard;
-    private int maxRow;
-    private int maxCol;
+    private final int maxRow;
+    private final int maxCol;
     //overlay on our board JButtons
     private JButton[][] gridButtons;
-    private Player winner;
 
     public GameController(Board gameBoard) {
         this.gameBoard = gameBoard;
@@ -185,7 +184,7 @@ public class GameController {
         WinCondition winnerCheck = new WinCondition();
 
         //pass player as argument to a loop for players and return winning player to variable
-        winner = winnerCheck.playersCheck(
+        Player winner = winnerCheck.playersCheck(
                 p -> winnerCheck.checkWinner(p.getColour())
         );
 
@@ -194,7 +193,6 @@ public class GameController {
             String message = "Winner is " + winner;
             showWinner(message);
             //safely reset winner. Not necessary as handled in the drop token but worth doing
-            winner = null;
         }
     }
 
